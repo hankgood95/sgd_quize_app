@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PTE SGD 템플릿 퀴즈</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f0f2f5;
+  --surface: #ffffff;
+  --surface2: #f8f9fa;
+  --text: #1a1d23;
+  --text-muted: #6c757d;
+  --border: #dee2e6;
+  --accent: #3b5bdb;
+  --v1: #3b5bdb;
+  --v2: #7048e8;
+  --v3: #c2255c;
+  --correct: #2f9e44;
+  --wrong: #e03131;
+  --study-fixed: #1c7ed6;
+  --study-var: #e8590c;
+  --radius: 12px;
+  --shadow: 0 2px 12px rgba(0,0,0,0.07);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #141517;
+    --surface: #1e1f23;
+    --surface2: #25262b;
+    --text: #e9ecef;
+    --text-muted: #868e96;
+    --border: #373a40;
+    --accent: #748ffc;
+    --v1: #748ffc;
+    --v2: #9775fa;
+    --v3: #f783ac;
+    --correct: #51cf66;
+    --wrong: #ff6b6b;
+    --study-fixed: #74c0fc;
+    --study-var: #ffa94d;
+    --shadow: 0 2px 12px rgba(0,0,0,0.3);
+  }
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+#progress-bar-track {
+  position: fixed; top: 0; left: 0; right: 0; height: 4px;
+  background: var(--border); z-index: 200;
+}
+#progress-bar {
+  height: 4px; background: var(--accent); width: 0%;
+  transition: width 0.4s ease;
+}
+.screen { display: none; }
+.screen.active { display: block; }
+.wrap {
+  max-width: 660px; margin: 0 auto;
+  padding: 52px 16px 80px;
+}
+
+/* ---- Typography ---- */
+h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 6px; }
+h2 { font-size: 1.15rem; font-weight: 700; margin-bottom: 18px; }
+.sub { color: var(--text-muted); font-size: 0.88rem; margin-bottom: 28px; }
+
+/* ---- Cards ---- */
+.card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  margin-bottom: 14px;
+}
+
+/* ---- Tag buttons ---- */
+.tag-group { margin-bottom: 18px; }
+.tag-label {
+  font-size: 0.75rem; font-weight: 700; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 8px;
+}
+.tag-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+.tag-btn {
+  padding: 6px 14px; border-radius: 20px;
+  border: 2px solid var(--border);
+  background: var(--surface); color: var(--text);
+  font-family: inherit; font-size: 0.88rem; font-weight: 600;
+  cursor: pointer; transition: all 0.15s;
+  white-space: nowrap;
+}
+.tag-btn:hover { border-color: var(--text-muted); }
+.tag-btn.active { color: #fff; border-color: var(--accent); background: var(--accent); }
+.tag-btn.v1.active { background: var(--v1); border-color: var(--v1); }
+.tag-btn.v2.active { background: var(--v2); border-color: var(--v2); }
+.tag-btn.v3.active { background: var(--v3); border-color: var(--v3); }
+
+/* ---- Buttons ---- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 11px 22px; border-radius: var(--radius);
+  border: 2px solid transparent;
+  font-family: inherit; font-size: 0.95rem; font-weight: 600;
+  cursor: pointer; transition: opacity 0.15s, transform 0.1s;
+  text-align: center;
+}
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-secondary { background: var(--surface); color: var(--text); border-color: var(--border); }
+.btn-danger { background: var(--wrong); color: #fff; }
+.btn-full { display: flex; width: 100%; margin-bottom: 10px; }
+.btn-sm { padding: 6px 14px; font-size: 0.82rem; border-radius: 8px; }
+.btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px; }
+
+/* ---- Back button ---- */
+.back-btn {
+  background: none; border: none; color: var(--text-muted);
+  font-family: inherit; font-size: 0.9rem; cursor: pointer;
+  display: flex; align-items: center; gap: 5px;
+  margin-bottom: 18px; padding: 0;
+}
+.back-btn:hover { color: var(--text); }
+
+/* ---- Badge ---- */
+.badge {
+  display: inline-block; padding: 3px 10px; border-radius: 12px;
+  font-size: 0.78rem; font-weight: 700;
+  background: var(--accent); color: #fff;
+}
+
+/* ---- Quiz ---- */
+.quiz-meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 8px; }
+.hint-line { font-size: 0.84rem; color: var(--text-muted); font-style: italic; margin-bottom: 16px; }
+.section-block { margin-bottom: 18px; }
+.section-label {
+  font-size: 0.75rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.6px;
+  margin-bottom: 10px;
+}
+.token-flow { font-size: 0.93rem; line-height: 2.6; }
+.token-blank-wrap { display: inline-block; vertical-align: middle; }
+.token-hint { display: none; font-size: 0.76rem; color: var(--correct); margin-top: 1px; }
+.t-input {
+  border: 2px solid var(--border); border-radius: 7px;
+  padding: 4px 10px; font-family: inherit; font-size: 0.88rem;
+  background: var(--surface); color: var(--text);
+  min-width: 130px; max-width: 100%;
+  transition: border-color 0.2s;
+}
+.t-input:focus { outline: none; border-color: var(--accent); }
+.t-select {
+  border: 2px solid var(--border); border-radius: 7px;
+  padding: 4px 8px; font-family: inherit; font-size: 0.85rem;
+  background: var(--surface); color: var(--text);
+  max-width: 260px; cursor: pointer;
+  transition: border-color 0.2s;
+}
+.t-select:focus { outline: none; border-color: var(--accent); }
+.state-correct .t-input,
+.state-correct .t-select { border-color: var(--correct); background: color-mix(in srgb, var(--correct) 10%, var(--surface)); }
+.state-wrong .t-input,
+.state-wrong .t-select { border-color: var(--wrong); background: color-mix(in srgb, var(--wrong) 10%, var(--surface)); }
+.state-wrong .token-hint { display: block; }
+.result-row {
+  font-size: 0.92rem; color: var(--text-muted); margin-bottom: 14px;
+}
+.c-ok { color: var(--correct); font-weight: 700; }
+.c-bad { color: var(--wrong); font-weight: 700; }
+
+/* ---- Study ---- */
+.tab-row {
+  display: flex; gap: 0; border-radius: var(--radius);
+  overflow: hidden; border: 2px solid var(--border); margin-bottom: 18px;
+}
+.tab-btn {
+  flex: 1; padding: 10px 6px; border: none;
+  background: var(--surface); color: var(--text-muted);
+  font-family: inherit; font-size: 0.84rem; font-weight: 600;
+  cursor: pointer; transition: all 0.15s;
+}
+.tab-btn.active { background: var(--accent); color: #fff; }
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
+.full-text { font-size: 0.92rem; line-height: 2; }
+.color-fixed { color: var(--study-fixed); font-weight: 600; }
+.color-var { color: var(--study-var); font-weight: 600; }
+.color-legend { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px; }
+
+/* ---- Flashcard ---- */
+.flashcard {
+  background: var(--surface); border: 2px solid var(--border);
+  border-radius: 18px; padding: 40px 24px;
+  text-align: center; cursor: pointer; min-height: 180px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 14px;
+  transition: transform 0.12s, box-shadow 0.12s;
+  box-shadow: var(--shadow);
+}
+.flashcard:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.12); }
+.flash-section { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.6px; }
+.flash-q { font-size: 1rem; font-weight: 700; }
+.flash-a { font-size: 0.9rem; color: var(--text); display: none; border-top: 1px solid var(--border); padding-top: 12px; width: 100%; }
+.flash-a.show { display: block; }
+.flash-tap { font-size: 0.78rem; color: var(--text-muted); }
+.flash-nav { display: flex; gap: 14px; align-items: center; justify-content: center; margin-top: 14px; }
+.flash-count { font-size: 0.85rem; color: var(--text-muted); }
+
+/* ---- Stats ---- */
+.stat-item { margin-bottom: 20px; }
+.stat-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; font-size: 0.9rem; font-weight: 600; }
+.stat-track { height: 13px; background: var(--bg); border-radius: 7px; overflow: hidden; }
+.stat-fill { height: 100%; border-radius: 7px; transition: width 0.6s ease; }
+.stat-sub { font-size: 0.78rem; color: var(--text-muted); margin-top: 4px; }
+
+/* ---- Wrong note ---- */
+.wrong-group { margin-bottom: 24px; }
+.wrong-group-title { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 10px; }
+.wrong-item {
+  background: var(--surface); border-radius: var(--radius);
+  padding: 12px 16px; margin-bottom: 8px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; box-shadow: var(--shadow);
+}
+.wrong-text { font-size: 0.88rem; flex: 1; }
+.wrong-type { font-size: 0.74rem; color: var(--text-muted); margin-top: 2px; }
+.empty-state { text-align: center; color: var(--text-muted); padding: 48px 0; font-size: 0.95rem; }
+.divider { height: 1px; background: var(--border); margin: 16px 0; }
+</style>
+</head>
+<body>
+
+<div id="progress-bar-track"><div id="progress-bar"></div></div>
+
+<!-- ===== HOME ===== -->
+<div id="screen-home" class="screen active">
+  <div class="wrap">
+    <h1>PTE SGD 템플릿 퀴즈</h1>
+    <p class="sub">Summarize Group Discussion 3가지 템플릿 반복 학습</p>
+    <div class="card">
+      <div class="tag-group">
+        <div class="tag-label">템플릿 버전</div>
+        <div class="tag-buttons">
+          <button class="tag-btn v1 active" data-g="version" data-v="v1">버전1 · 축소형</button>
+          <button class="tag-btn v2" data-g="version" data-v="v2">버전2 · 상세수식형</button>
+          <button class="tag-btn v3" data-g="version" data-v="v3">버전3 · 의견대립형</button>
+        </div>
+      </div>
+      <div class="tag-group">
+        <div class="tag-label">모드</div>
+        <div class="tag-buttons">
+          <button class="tag-btn active" data-g="mode" data-v="typing">타이핑</button>
+          <button class="tag-btn" data-g="mode" data-v="dropdown">드롭다운 4지선다</button>
+        </div>
+      </div>
+      <div class="tag-group">
+        <div class="tag-label">난이도</div>
+        <div class="tag-buttons">
+          <button class="tag-btn active" data-g="diff" data-v="3">입문 (3개)</button>
+          <button class="tag-btn" data-g="diff" data-v="5">중급 (5개)</button>
+          <button class="tag-btn" data-g="diff" data-v="8">고급 (8개)</button>
+          <button class="tag-btn" data-g="diff" data-v="99">전체</button>
+        </div>
+      </div>
+    </div>
+    <div class="btn-grid">
+      <button class="btn btn-primary" onclick="startQuiz()">퀴즈 시작</button>
+      <button class="btn btn-secondary" onclick="goStudy()">공부하기</button>
+      <button class="btn btn-secondary" onclick="goStats()">통계 보기</button>
+      <button class="btn btn-secondary" onclick="goWrong()">오답노트</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div id="screen-quiz" class="screen">
+  <div class="wrap">
+    <button class="back-btn" onclick="showScreen('home')">← 홈으로</button>
+    <div class="quiz-meta">
+      <span id="qz-badge" class="badge">V1</span>
+      <span id="qz-cnt" class="badge" style="background:var(--text-muted)">빈칸 3개</span>
+      <span id="qz-mode" class="badge" style="background:var(--text-muted)">타이핑</span>
+    </div>
+    <div id="qz-hint" class="hint-line"></div>
+    <div id="qz-body" class="card"></div>
+    <div id="qz-result" class="result-row" style="display:none"></div>
+    <div class="btn-grid">
+      <button class="btn btn-primary" id="btn-check" onclick="checkAnswers()">확인</button>
+      <button class="btn btn-secondary" id="btn-next" onclick="newQuestion()" style="display:none">새 문제</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== STUDY ===== -->
+<div id="screen-study" class="screen">
+  <div class="wrap">
+    <button class="back-btn" onclick="showScreen('home')">← 홈으로</button>
+    <h2>공부하기</h2>
+    <div class="tag-group">
+      <div class="tag-label">버전 선택</div>
+      <div class="tag-buttons">
+        <button class="tag-btn v1 active" data-g="sv" data-v="v1">버전1 · 축소형</button>
+        <button class="tag-btn v2" data-g="sv" data-v="v2">버전2 · 상세수식형</button>
+        <button class="tag-btn v3" data-g="sv" data-v="v3">버전3 · 의견대립형</button>
+      </div>
+    </div>
+    <div class="tab-row">
+      <button class="tab-btn active" data-tab="full">전체 보기</button>
+      <button class="tab-btn" data-tab="color">색상 구분</button>
+      <button class="tab-btn" data-tab="flash">플래시카드</button>
+    </div>
+    <div id="tab-full" class="tab-pane active">
+      <div class="card" id="study-full-body"></div>
+    </div>
+    <div id="tab-color" class="tab-pane">
+      <div class="card">
+        <p class="color-legend">
+          <span class="color-fixed">파란색</span> = 외워야 할 구문 &nbsp;|&nbsp;
+          <span class="color-var">주황색</span> = 변수 자리
+        </p>
+        <div id="study-color-body"></div>
+      </div>
+    </div>
+    <div id="tab-flash" class="tab-pane">
+      <div id="flash-wrap"></div>
+    </div>
+    <button class="btn btn-primary btn-full" style="margin-top:18px" onclick="quizFromStudy()">이 버전 퀴즈 풀기</button>
+  </div>
+</div>
+
+<!-- ===== STATS ===== -->
+<div id="screen-stats" class="screen">
+  <div class="wrap">
+    <button class="back-btn" onclick="showScreen('home')">← 홈으로</button>
+    <h2>통계</h2>
+    <div class="card" id="stats-body"></div>
+    <button class="btn btn-secondary btn-full" onclick="resetStats()">통계 초기화</button>
+  </div>
+</div>
+
+<!-- ===== WRONG NOTE ===== -->
+<div id="screen-wrong" class="screen">
+  <div class="wrap">
+    <button class="back-btn" onclick="showScreen('home')">← 홈으로</button>
+    <h2>오답노트</h2>
+    <div id="wrong-body"></div>
+  </div>
+</div>
+
+<script>
+// ================================================================
+//  TEMPLATE DATA
+// ================================================================
+const TPL = {
+  v1: {
+    name: '버전1 · 축소형', short: 'V1', cvar: '--v1',
+    hint: '들은 정보가 많거나 유창성(Oral Fluency)을 최우선으로 할 때',
+    tokens: [
+      { id:'t01', sec:'서론', type:'fixed', text:'The discussion was about',
+        wrongs:['It discussed about','They were talking at','This talk is for'] },
+      { id:'t02', sec:'서론', type:'var', text:'(주제)', label:'주제' },
+      { id:'t03', sec:'본론', type:'fixed', text:'To begin with,',
+        wrongs:['In addition to','Lastly however','At the same time'] },
+      { id:'t04', sec:'본론', type:'fixed', text:'the first speaker introduced the discussion',
+        wrongs:['the first speaker ended the topic','a speaker changed the subject','the first person disagreed with all'] },
+      { id:'t05', sec:'본론', type:'fixed', text:', and she/he said',
+        wrongs:['they were','she/he asked','both said'] },
+      { id:'t06', sec:'본론', type:'var', text:'(화자1 핵심내용)', label:'화자1 핵심내용' },
+      { id:'t07', sec:'본론', type:'fixed', text:'And the second speaker said',
+        wrongs:['And the first speaker said','But the second speaker ignored','Then nobody said'] },
+      { id:'t08', sec:'본론', type:'var', text:'(화자2 핵심내용)', label:'화자2 핵심내용' },
+      { id:'t09', sec:'본론', type:'fixed', text:'And/so, the third speaker said',
+        wrongs:['But the third speaker left','And the second speaker said','The third speaker ignored everyone'] },
+      { id:'t10', sec:'본론', type:'var', text:'(화자3 핵심내용)', label:'화자3 핵심내용' },
+      { id:'t11', sec:'결론', type:'fixed', text:'Lastly, they recognized the importance of the topic',
+        wrongs:['Finally, they ignored the topic completely','At the end, nobody agreed','Lastly, they changed the subject'] },
+      { id:'t12', sec:'결론', type:'fixed', text:', and',
+        wrongs:[', but','; however','. Also'] },
+      { id:'t13', sec:'결론', type:'var', text:'(최종합의/결론)', label:'최종합의/결론' },
+    ]
+  },
+  v2: {
+    name: '버전2 · 상세수식형', short: 'V2', cvar: '--v2',
+    hint: '키워드가 적어 2분을 채우기 힘들 때, 수식어로 분량 확보',
+    tokens: [
+      { id:'t01', sec:'서론', type:'fixed', text:'The discussion was about',
+        wrongs:['It discussed about','They were talking at','This talk is for'] },
+      { id:'t02', sec:'서론', type:'var', text:'(주제)', label:'주제' },
+      { id:'t03', sec:'본론', type:'fixed', text:'To begin with, the first speaker introduced the discussion by clearly explaining her ideas',
+        wrongs:['To begin with, the first speaker ended the talk by hiding ideas','Finally, the first speaker started by confusing everyone','To begin with, the second speaker dismissed the discussion'] },
+      { id:'t04', sec:'본론', type:'var', text:'(화자1내용)', label:'화자1내용' },
+      { id:'t05', sec:'본론', type:'fixed', text:'underlining several reasons behind this point',
+        wrongs:['ignoring all evidence behind this','hiding all the reasons behind that','dismissing several reasons for this'] },
+      { id:'t06', sec:'본론', type:'fixed', text:'which made the context more understandable and related to the other speakers',
+        wrongs:['which made the topic harder to understand','which confused the other speakers a lot','which made the other speakers disagree strongly'] },
+      { id:'t07', sec:'본론', type:'fixed', text:"The second participant actively participated and could relate to the first speaker's idea/experience",
+        wrongs:['The second participant stayed silent and ignored the first speaker','The third participant actively disagreed with everything said','The second participant forgot what the first speaker mentioned'] },
+      { id:'t08', sec:'본론', type:'fixed', text:'This student went on to further explain the point. He/She said',
+        wrongs:['This student refused to continue the discussion','This student changed the topic entirely','This student disagreed with every point made'] },
+      { id:'t09', sec:'본론', type:'var', text:'(화자2내용)', label:'화자2내용' },
+      { id:'t10', sec:'결론', type:'fixed', text:'Lastly, they recognized the importance of the topic',
+        wrongs:['Finally, they ignored the topic completely','At the end, nobody agreed','Lastly, they changed the subject'] },
+      { id:'t11', sec:'결론', type:'fixed', text:', and',
+        wrongs:[', but','; however','. Also'] },
+      { id:'t12', sec:'결론', type:'var', text:'(최종합의/결론)', label:'최종합의/결론' },
+    ]
+  },
+  v3: {
+    name: '버전3 · 의견대립형', short: 'V3', cvar: '--v3',
+    hint: '화자 간 반대 의견이 있을 때, 내용 이해도(Content) 강력 어필',
+    tokens: [
+      { id:'t01', sec:'서론', type:'fixed', text:'The discussion was about',
+        wrongs:['It discussed about','They were talking at','This talk is for'] },
+      { id:'t02', sec:'서론', type:'var', text:'(주제)', label:'주제' },
+      { id:'t03', sec:'본론', type:'fixed', text:'To begin with, the first speaker introduced the discussion',
+        wrongs:['To begin with, the first speaker ended the talk','Finally, the first speaker started by confusing everyone','To begin with, the second speaker dismissed the discussion'] },
+      { id:'t04', sec:'본론', type:'fixed', text:', and she/he said',
+        wrongs:['they were','she/he asked','both said'] },
+      { id:'t05', sec:'본론', type:'var', text:'(화자1내용)', label:'화자1내용' },
+      { id:'t06', sec:'본론', type:'fixed', text:'The second speaker suggested that',
+        wrongs:['The second speaker ignored everything','The second speaker left the discussion','The second speaker contradicted themselves'] },
+      { id:'t07', sec:'본론', type:'var', text:'(화자2내용)', label:'화자2내용' },
+      { id:'t08', sec:'본론', type:'fixed', text:'While the third speaker offered a different perspective and partially disagreed with their ideas. She/He said',
+        wrongs:['While the third speaker fully agreed with all ideas','But the third speaker ignored the previous speakers','And the third speaker repeated what was already said'] },
+      { id:'t09', sec:'본론', type:'var', text:'(화자3의 반대/다른의견)', label:'화자3의 반대/다른의견' },
+      { id:'t10', sec:'결론', type:'fixed', text:'At this stage of the discussion, they recognized the complexity of the topic',
+        wrongs:['At this stage, they all completely agreed on everything','At this stage, they forgot the topic entirely','At this stage, only one speaker was correct'] },
+      { id:'t11', sec:'결론', type:'fixed', text:', but also agreed that',
+        wrongs:[', but never agreed on',', and disagreed that','; however they rejected'] },
+      { id:'t12', sec:'결론', type:'var', text:'(최종합의/결론)', label:'최종합의/결론' },
+    ]
+  }
+};
+
+// ================================================================
+//  STATE
+// ================================================================
+const S = {
+  version: 'v1',
+  mode: 'typing',
+  diff: 3,
+  quizBlanks: [],
+  answered: false,
+  sv: 'v1',       // study version
+  stab: 'full',   // study tab
+  fIdx: 0,        // flash index
+  fRevealed: false,
+};
+
+// ================================================================
+//  STORAGE
+// ================================================================
+function getStats() {
+  const def = { v1:{c:0,t:0}, v2:{c:0,t:0}, v3:{c:0,t:0} };
+  try {
+    const raw = JSON.parse(localStorage.getItem('pte_sgd_stats') || '{}');
+    ['v1','v2','v3'].forEach(k => { if (raw[k]) def[k] = {...def[k], ...raw[k]}; });
+    return def;
+  } catch { return def; }
+}
+function saveStats(s) { localStorage.setItem('pte_sgd_stats', JSON.stringify(s)); }
+function getWrong() {
+  try { return JSON.parse(localStorage.getItem('pte_sgd_wrong') || '[]'); }
+  catch { return []; }
+}
+function saveWrong(w) { localStorage.setItem('pte_sgd_wrong', JSON.stringify(w)); }
+
+// ================================================================
+//  NAV
+// ================================================================
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  window.scrollTo(0, 0);
+  setProgress(0);
+}
+function goStudy() { renderStudy(); showScreen('study'); }
+function goStats() { renderStats(); showScreen('stats'); }
+function goWrong() { renderWrong(); showScreen('wrong'); }
+function setProgress(p) { document.getElementById('progress-bar').style.width = p + '%'; }
+
+// ================================================================
+//  TAG BUTTON EVENTS
+// ================================================================
+document.addEventListener('click', function(e) {
+  const btn = e.target.closest('[data-g]');
+  if (!btn) return;
+  const g = btn.dataset.g;
+  const v = btn.dataset.v;
+  document.querySelectorAll(`[data-g="${g}"]`).forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (g === 'version') S.version = v;
+  else if (g === 'mode') S.mode = v;
+  else if (g === 'diff') S.diff = parseInt(v);
+  else if (g === 'sv') { S.sv = v; renderStudy(); }
+});
+
+document.addEventListener('click', function(e) {
+  const btn = e.target.closest('[data-tab]');
+  if (!btn) return;
+  const tab = btn.dataset.tab;
+  document.querySelectorAll('.tab-btn[data-tab]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  S.stab = tab;
+  if (tab === 'flash') { S.fIdx = 0; S.fRevealed = false; renderFlash(); }
+});
+
+// ================================================================
+//  QUIZ
+// ================================================================
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function pickBlanks(ver, n) {
+  const len = TPL[ver].tokens.length;
+  const idx = TPL[ver].tokens.map((_, i) => i);
+  shuffle(idx);
+  return idx.slice(0, Math.min(n, len)).sort((a, b) => a - b);
+}
+
+function wrongsFor(ver, i) {
+  const tok = TPL[ver].tokens[i];
+  if (tok.type === 'fixed') return [...tok.wrongs];
+  const pool = TPL[ver].tokens
+    .filter((t, j) => t.type === 'var' && j !== i)
+    .map(t => t.text);
+  while (pool.length < 3) pool.push('(생략)', '(내용 없음)', '(기타)');
+  return shuffle(pool).slice(0, 3);
+}
+
+function startQuiz(verOverride) {
+  if (verOverride) {
+    S.version = verOverride;
+    document.querySelectorAll('[data-g="version"]').forEach(b =>
+      b.classList.toggle('active', b.dataset.v === verOverride));
+  }
+  S.quizBlanks = pickBlanks(S.version, S.diff);
+  S.answered = false;
+  renderQuiz();
+  showScreen('quiz');
+}
+
+function renderQuiz() {
+  const tpl = TPL[S.version];
+  const badge = document.getElementById('qz-badge');
+  badge.textContent = tpl.short + ' · ' + tpl.name.split('·')[1].trim();
+  badge.style.background = `var(${tpl.cvar})`;
+  document.getElementById('qz-cnt').textContent = `빈칸 ${S.quizBlanks.length}개`;
+  document.getElementById('qz-mode').textContent = S.mode === 'typing' ? '타이핑' : '4지선다';
+  document.getElementById('qz-hint').textContent = tpl.hint;
+
+  // Group by section
+  const secs = {};
+  tpl.tokens.forEach((tok, i) => {
+    (secs[tok.sec] = secs[tok.sec] || []).push({ tok, i });
+  });
+
+  const body = document.getElementById('qz-body');
+  body.innerHTML = '';
+
+  ['서론','본론','결론'].forEach(sec => {
+    if (!secs[sec]) return;
+    const block = document.createElement('div');
+    block.className = 'section-block';
+
+    const lbl = document.createElement('div');
+    lbl.className = 'section-label';
+    lbl.style.color = `var(${tpl.cvar})`;
+    lbl.textContent = sec;
+    block.appendChild(lbl);
+
+    const flow = document.createElement('div');
+    flow.className = 'token-flow';
+
+    secs[sec].forEach(({ tok, i }) => {
+      const isBlank = S.quizBlanks.includes(i);
+      if (!isBlank) {
+        flow.appendChild(document.createTextNode(' ' + tok.text + ' '));
+        return;
+      }
+      // blank
+      const wrap = document.createElement('span');
+      wrap.className = 'token-blank-wrap';
+      wrap.dataset.i = i;
+
+      flow.appendChild(document.createTextNode(' '));
+
+      if (S.mode === 'typing') {
+        const inp = document.createElement('input');
+        inp.type = 'text';
+        inp.className = 't-input';
+        inp.placeholder = tok.type === 'var' ? tok.label || '내용 입력' : '입력하세요';
+        inp.dataset.ans = tok.text;
+        inp.addEventListener('keydown', e => { if (e.key === 'Enter') checkAnswers(); });
+        wrap.appendChild(inp);
+      } else {
+        const sel = document.createElement('select');
+        sel.className = 't-select';
+        sel.dataset.ans = tok.text;
+        const opts = shuffle([tok.text, ...wrongsFor(S.version, i)]);
+        const ph = document.createElement('option');
+        ph.value = ''; ph.textContent = '-- 선택 --';
+        sel.appendChild(ph);
+        opts.forEach(o => {
+          const opt = document.createElement('option');
+          opt.value = o; opt.textContent = o;
+          sel.appendChild(opt);
+        });
+        wrap.appendChild(sel);
+      }
+
+      const hint = document.createElement('div');
+      hint.className = 'token-hint';
+      hint.textContent = '정답: ' + tok.text;
+      wrap.appendChild(hint);
+
+      flow.appendChild(wrap);
+      flow.appendChild(document.createTextNode(' '));
+    });
+
+    block.appendChild(flow);
+    body.appendChild(block);
+  });
+
+  document.getElementById('qz-result').style.display = 'none';
+  document.getElementById('btn-check').style.display = '';
+  document.getElementById('btn-next').style.display = 'none';
+  setProgress(0);
+}
+
+function checkAnswers() {
+  if (S.answered) return;
+  S.answered = true;
+
+  const tpl = TPL[S.version];
+  let ok = 0, tot = 0;
+  const wrongList = getWrong();
+
+  document.querySelectorAll('#qz-body .token-blank-wrap').forEach(wrap => {
+    const i = parseInt(wrap.dataset.i);
+    const tok = tpl.tokens[i];
+    const el = wrap.querySelector('input,select');
+    const val = el ? el.value.trim() : '';
+    tot++;
+
+    let correct = false;
+    if (tok.type === 'var' && S.mode === 'typing') {
+      correct = val.length > 0;
+    } else {
+      correct = val.toLowerCase() === tok.text.toLowerCase();
+    }
+
+    if (correct) {
+      wrap.classList.add('state-correct');
+      ok++;
+      const wIdx = wrongList.findIndex(w => w.ver === S.version && w.id === tok.id);
+      if (wIdx !== -1) wrongList.splice(wIdx, 1);
+    } else {
+      wrap.classList.add('state-wrong');
+      if (tok.type === 'fixed' && !wrongList.find(w => w.ver === S.version && w.id === tok.id)) {
+        wrongList.push({ ver: S.version, id: tok.id, text: tok.text, type: 'fixed' });
+      }
+    }
+    if (el) el.disabled = true;
+  });
+
+  saveWrong(wrongList);
+
+  const stats = getStats();
+  stats[S.version].c += ok;
+  stats[S.version].t += tot;
+  saveStats(stats);
+
+  const pct = tot > 0 ? Math.round(ok / tot * 100) : 0;
+  const res = document.getElementById('qz-result');
+  res.style.display = 'block';
+  res.innerHTML = `<span class="${pct >= 70 ? 'c-ok' : 'c-bad'}">${ok}/${tot} 정답 (${pct}%)</span>`;
+  setProgress(pct);
+
+  document.getElementById('btn-check').style.display = 'none';
+  document.getElementById('btn-next').style.display = '';
+}
+
+function newQuestion() {
+  S.quizBlanks = pickBlanks(S.version, S.diff);
+  S.answered = false;
+  renderQuiz();
+}
+
+// ================================================================
+//  STUDY
+// ================================================================
+function renderStudy() {
+  document.querySelectorAll('[data-g="sv"]').forEach(b =>
+    b.classList.toggle('active', b.dataset.v === S.sv));
+  renderStudyFull();
+  renderStudyColor();
+  if (S.stab === 'flash') { S.fIdx = 0; S.fRevealed = false; renderFlash(); }
+}
+
+function secGroups(ver) {
+  const g = {};
+  TPL[ver].tokens.forEach((tok, i) => (g[tok.sec] = g[tok.sec] || []).push({ tok, i }));
+  return g;
+}
+
+function renderStudyFull() {
+  const tpl = TPL[S.sv];
+  const g = secGroups(S.sv);
+  const el = document.getElementById('study-full-body');
+  el.innerHTML = '';
+  ['서론','본론','결론'].forEach(sec => {
+    if (!g[sec]) return;
+    const b = document.createElement('div');
+    b.className = 'section-block';
+    const lbl = document.createElement('div');
+    lbl.className = 'section-label';
+    lbl.style.color = `var(${tpl.cvar})`;
+    lbl.textContent = sec;
+    b.appendChild(lbl);
+    const p = document.createElement('p');
+    p.className = 'full-text';
+    p.textContent = g[sec].map(x => x.tok.text).join(' ');
+    b.appendChild(p);
+    el.appendChild(b);
+  });
+}
+
+function renderStudyColor() {
+  const tpl = TPL[S.sv];
+  const g = secGroups(S.sv);
+  const el = document.getElementById('study-color-body');
+  el.innerHTML = '';
+  ['서론','본론','결론'].forEach(sec => {
+    if (!g[sec]) return;
+    const b = document.createElement('div');
+    b.className = 'section-block';
+    const lbl = document.createElement('div');
+    lbl.className = 'section-label';
+    lbl.style.color = `var(${tpl.cvar})`;
+    lbl.textContent = sec;
+    b.appendChild(lbl);
+    const line = document.createElement('p');
+    line.className = 'full-text';
+    g[sec].forEach(({ tok }) => {
+      const sp = document.createElement('span');
+      sp.textContent = tok.text + ' ';
+      sp.className = tok.type === 'fixed' ? 'color-fixed' : 'color-var';
+      line.appendChild(sp);
+    });
+    b.appendChild(line);
+    el.appendChild(b);
+  });
+}
+
+function renderFlash() {
+  const tpl = TPL[S.sv];
+  const tokens = tpl.tokens;
+  const total = tokens.length;
+  const tok = tokens[S.fIdx];
+
+  document.getElementById('flash-wrap').innerHTML = `
+    <div class="flashcard" onclick="toggleFlash()">
+      <div class="flash-section" style="color:var(${tpl.cvar})">${tok.sec}</div>
+      <div class="flash-q" style="color:var(${tpl.cvar})">${tok.type === 'var' ? tok.label || tok.text : '표현 #' + (S.fIdx + 1)}</div>
+      <div class="flash-a ${S.fRevealed ? 'show' : ''}">${tok.text}</div>
+      <div class="flash-tap">${S.fRevealed ? '확인 완료' : '탭하여 정답 보기'}</div>
+    </div>
+    <div class="flash-nav">
+      <button class="btn btn-secondary btn-sm" onclick="prevFlash()" ${S.fIdx === 0 ? 'disabled' : ''}>← 이전</button>
+      <span class="flash-count">${S.fIdx + 1} / ${total}</span>
+      <button class="btn btn-secondary btn-sm" onclick="nextFlash()" ${S.fIdx === total - 1 ? 'disabled' : ''}>다음 →</button>
+    </div>
+  `;
+  setProgress(Math.round((S.fIdx + 1) / total * 100));
+}
+
+function toggleFlash() { S.fRevealed = !S.fRevealed; renderFlash(); }
+function prevFlash() { if (S.fIdx > 0) { S.fIdx--; S.fRevealed = false; renderFlash(); } }
+function nextFlash() {
+  const len = TPL[S.sv].tokens.length;
+  if (S.fIdx < len - 1) { S.fIdx++; S.fRevealed = false; renderFlash(); }
+}
+
+function quizFromStudy() {
+  S.version = S.sv;
+  document.querySelectorAll('[data-g="version"]').forEach(b =>
+    b.classList.toggle('active', b.dataset.v === S.version));
+  startQuiz();
+}
+
+// ================================================================
+//  STATS
+// ================================================================
+function renderStats() {
+  const stats = getStats();
+  const el = document.getElementById('stats-body');
+  el.innerHTML = '';
+  ['v1','v2','v3'].forEach((v, idx) => {
+    const tpl = TPL[v];
+    const s = stats[v];
+    const pct = s.t > 0 ? Math.round(s.c / s.t * 100) : 0;
+    const item = document.createElement('div');
+    item.className = 'stat-item';
+    item.innerHTML = `
+      <div class="stat-head">
+        <span>${tpl.name}</span>
+        <span style="color:var(${tpl.cvar})">${pct}%</span>
+      </div>
+      <div class="stat-track">
+        <div class="stat-fill" style="width:${pct}%;background:var(${tpl.cvar})"></div>
+      </div>
+      <div class="stat-sub">${s.c} / ${s.t} 정답</div>
+    `;
+    el.appendChild(item);
+    if (idx < 2) { const d = document.createElement('div'); d.className = 'divider'; el.appendChild(d); }
+  });
+}
+
+function resetStats() {
+  if (!confirm('통계를 초기화하시겠습니까?')) return;
+  saveStats({ v1:{c:0,t:0}, v2:{c:0,t:0}, v3:{c:0,t:0} });
+  renderStats();
+}
+
+// ================================================================
+//  WRONG NOTE
+// ================================================================
+function renderWrong() {
+  const list = getWrong();
+  const el = document.getElementById('wrong-body');
+  el.innerHTML = '';
+  if (list.length === 0) {
+    el.innerHTML = '<div class="empty-state">오답이 없습니다. 훌륭합니다!</div>';
+    return;
+  }
+  ['v1','v2','v3'].forEach(v => {
+    const items = list.filter(w => w.ver === v);
+    if (!items.length) return;
+    const tpl = TPL[v];
+    const grp = document.createElement('div');
+    grp.className = 'wrong-group';
+    const ttl = document.createElement('div');
+    ttl.className = 'wrong-group-title';
+    ttl.style.color = `var(${tpl.cvar})`;
+    ttl.textContent = tpl.name;
+    grp.appendChild(ttl);
+    items.forEach(w => {
+      const item = document.createElement('div');
+      item.className = 'wrong-item';
+      item.innerHTML = `
+        <div>
+          <div class="wrong-text">${w.text}</div>
+          <div class="wrong-type">고정 표현</div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="retryWrong('${v}')">다시 풀기</button>
+      `;
+      grp.appendChild(item);
+    });
+    el.appendChild(grp);
+  });
+}
+
+function retryWrong(v) {
+  S.version = v;
+  document.querySelectorAll('[data-g="version"]').forEach(b =>
+    b.classList.toggle('active', b.dataset.v === v));
+  startQuiz(v);
+}
+
+// ================================================================
+//  INIT
+// ================================================================
+showScreen('home');
+</script>
+</body>
+</html>
